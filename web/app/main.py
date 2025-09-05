@@ -72,7 +72,7 @@ async def upload_file(file: UploadFile = File(...)):
         "job_id": job_id,
         "filename": file.filename,
         "file_size": file_size,
-        "message": "Fil mottagen - dummy MVP",
+        "message": "Fil mottagen - dummy MVP (secrets test)",
         "timestamp": datetime.utcnow().isoformat(),
         "environment": os.getenv("ENVIRONMENT", "development")
     }
