@@ -59,19 +59,19 @@ jobs:
     - name: Build Docker image
       run: |
         cd worker
-        docker build -t $REGISTRY/$PROJECT_ID/stems-worker-staging:$GITHUB_SHA .
-        docker tag $REGISTRY/$PROJECT_ID/stems-worker-staging:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems-worker-staging:latest
+        docker build -t $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:$GITHUB_SHA .
+        docker tag $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:latest
     
     - name: Push Docker image
       run: |
         cd worker
-        docker push $REGISTRY/$PROJECT_ID/stems-worker-staging:$GITHUB_SHA
-        docker push $REGISTRY/$PROJECT_ID/stems-worker-staging:latest
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:$GITHUB_SHA
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:latest
     
     - name: Deploy to Cloud Run (Staging)
       run: |
         gcloud run deploy stems-worker-staging \
-          --image $REGISTRY/$PROJECT_ID/stems-worker-staging:$GITHUB_SHA \
+          --image $REGISTRY/$PROJECT_ID/stems/stems-worker-staging:$GITHUB_SHA \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
@@ -117,19 +117,19 @@ jobs:
     - name: Build Docker image
       run: |
         cd worker
-        docker build -t $REGISTRY/$PROJECT_ID/stems-worker:$GITHUB_SHA .
-        docker tag $REGISTRY/$PROJECT_ID/stems-worker:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems-worker:latest
+        docker build -t $REGISTRY/$PROJECT_ID/stems/stems-worker:$GITHUB_SHA .
+        docker tag $REGISTRY/$PROJECT_ID/stems/stems-worker:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems/stems-worker:latest
     
     - name: Push Docker image
       run: |
         cd worker
-        docker push $REGISTRY/$PROJECT_ID/stems-worker:$GITHUB_SHA
-        docker push $REGISTRY/$PROJECT_ID/stems-worker:latest
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-worker:$GITHUB_SHA
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-worker:latest
     
     - name: Deploy to Cloud Run (Production)
       run: |
         gcloud run deploy stems-worker \
-          --image $REGISTRY/$PROJECT_ID/stems-worker:$GITHUB_SHA \
+          --image $REGISTRY/$PROJECT_ID/stems/stems-worker:$GITHUB_SHA \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \

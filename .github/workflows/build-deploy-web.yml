@@ -59,19 +59,19 @@ jobs:
     - name: Build Docker image
       run: |
         cd web
-        docker build -t $REGISTRY/$PROJECT_ID/stems-web-staging:$GITHUB_SHA .
-        docker tag $REGISTRY/$PROJECT_ID/stems-web-staging:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems-web-staging:latest
+        docker build -t $REGISTRY/$PROJECT_ID/stems/stems-web-staging:$GITHUB_SHA .
+        docker tag $REGISTRY/$PROJECT_ID/stems/stems-web-staging:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems/stems-web-staging:latest
     
     - name: Push Docker image
       run: |
         cd web
-        docker push $REGISTRY/$PROJECT_ID/stems-web-staging:$GITHUB_SHA
-        docker push $REGISTRY/$PROJECT_ID/stems-web-staging:latest
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-web-staging:$GITHUB_SHA
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-web-staging:latest
     
     - name: Deploy to Cloud Run (Staging)
       run: |
         gcloud run deploy stems-web-staging \
-          --image $REGISTRY/$PROJECT_ID/stems-web-staging:$GITHUB_SHA \
+          --image $REGISTRY/$PROJECT_ID/stems/stems-web-staging:$GITHUB_SHA \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
@@ -117,19 +117,19 @@ jobs:
     - name: Build Docker image
       run: |
         cd web
-        docker build -t $REGISTRY/$PROJECT_ID/stems-web:$GITHUB_SHA .
-        docker tag $REGISTRY/$PROJECT_ID/stems-web:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems-web:latest
+        docker build -t $REGISTRY/$PROJECT_ID/stems/stems-web:$GITHUB_SHA .
+        docker tag $REGISTRY/$PROJECT_ID/stems/stems-web:$GITHUB_SHA $REGISTRY/$PROJECT_ID/stems/stems-web:latest
     
     - name: Push Docker image
       run: |
         cd web
-        docker push $REGISTRY/$PROJECT_ID/stems-web:$GITHUB_SHA
-        docker push $REGISTRY/$PROJECT_ID/stems-web:latest
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-web:$GITHUB_SHA
+        docker push $REGISTRY/$PROJECT_ID/stems/stems-web:latest
     
     - name: Deploy to Cloud Run (Production)
       run: |
         gcloud run deploy stems-web \
-          --image $REGISTRY/$PROJECT_ID/stems-web:$GITHUB_SHA \
+          --image $REGISTRY/$PROJECT_ID/stems/stems-web:$GITHUB_SHA \
           --region $REGION \
           --platform managed \
           --allow-unauthenticated \
