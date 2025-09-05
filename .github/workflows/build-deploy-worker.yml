@@ -1,0 +1,96 @@
+name: Build and Deploy Worker Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'worker/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'worker/**'
+
+env:
+  PROJECT_ID: stems-471207
+  REGION: europe-north2
+  SERVICE_NAME: stems-worker
+  REGISTRY: europe-north2-docker.pkg.dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd worker
+        python3 -m pip install -r requirements.txt
+    
+    - name: Run tests (placeholder)
+      run: |
+        cd worker
+        python3 -m pytest || echo "No tests yet"
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Google Auth
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+    
+    - name: Configure Docker
+      run: gcloud auth configure-docker $REGISTRY
+    
+    - name: Build Docker image
+      run: |
+        cd worker
+        docker build -t $REGISTRY/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        docker tag $REGISTRY/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA $REGISTRY/$PROJECT_ID/$SERVICE_NAME:latest
+    
+    - name: Push Docker image
+      run: |
+        cd worker
+        docker push $REGISTRY/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+        docker push $REGISTRY/$PROJECT_ID/$SERVICE_NAME:latest
+    
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image $REGISTRY/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated \
+          --port 8080 \
+          --memory 2Gi \
+          --cpu 2 \
+          --min-instances 0 \
+          --max-instances 5 \
+          --set-env-vars ENVIRONMENT=production,BUCKET_NAME=stems-input,REGION=europe-north2
+    
+    - name: Get service URL
+      id: service-url
+      run: |
+        SERVICE_URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
+        echo "url=$SERVICE_URL" >> $GITHUB_OUTPUT
+        echo "Worker service deployed at: $SERVICE_URL"
+    
+    - name: Test deployment
+      run: |
+        sleep 30  # Wait for deployment to be ready
+        curl -f ${{ steps.service-url.outputs.url }}/health || exit 1

@@ -1,0 +1,7 @@
+# Conda configuration for Stems project
+channels:
+  - defaults
+  - conda-forge
+
+# Always use python3 explicitly to avoid alias conflicts
+auto_activate_base: false
