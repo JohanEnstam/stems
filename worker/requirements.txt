@@ -5,6 +5,7 @@ google-cloud-pubsub==2.18.4
 librosa==0.10.1
 numpy==1.24.3
 scipy==1.11.4
+pytest==7.4.3
 # Demucs för stem-splitting (kommer senare)
 # torch==2.1.0
 # demucs==4.0.0
