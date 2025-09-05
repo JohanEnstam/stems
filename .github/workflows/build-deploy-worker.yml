@@ -11,10 +11,10 @@ on:
       - 'worker/**'
 
 env:
-  PROJECT_ID: stems-471207
-  REGION: europe-north2
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   SERVICE_NAME: stems-worker
-  REGISTRY: europe-north2-docker.pkg.dev
+  REGISTRY: ${{ secrets.GCP_REGISTRY }}
 
 jobs:
   test:
@@ -81,7 +81,7 @@ jobs:
           --cpu 2 \
           --min-instances 0 \
           --max-instances 5 \
-          --set-env-vars ENVIRONMENT=production,BUCKET_NAME=stems-input,REGION=europe-north2
+          --set-env-vars ENVIRONMENT=production,BUCKET_NAME=${{ secrets.GCP_BUCKET_NAME }},REGION=${{ secrets.GCP_REGION }}
     
     - name: Get service URL
       id: service-url

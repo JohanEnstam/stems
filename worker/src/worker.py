@@ -16,8 +16,8 @@ class StemWorker:
     """Worker klass för stem-splitting operationer"""
     
     def __init__(self):
-        self.bucket_name = os.getenv("BUCKET_NAME", "stems-input")
-        self.region = os.getenv("REGION", "europe-north2")
+        self.bucket_name = os.getenv("BUCKET_NAME", "your-bucket-name")
+        self.region = os.getenv("REGION", "your-region")
         
     def process_audio_file(self, file_path: str, metadata: Dict[str, Any]) -> Dict[str, str]:
         """

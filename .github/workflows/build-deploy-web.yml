@@ -11,10 +11,10 @@ on:
       - 'web/**'
 
 env:
-  PROJECT_ID: stems-471207
-  REGION: europe-north2
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   SERVICE_NAME: stems-web
-  REGISTRY: europe-north2-docker.pkg.dev
+  REGISTRY: ${{ secrets.GCP_REGISTRY }}
 
 jobs:
   test:
