@@ -1,13 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import os
 from datetime import datetime
+import uuid
 
 app = FastAPI(
     title="Stems API",
     description="API för stem-splitting av musik",
     version="1.0.0"
 )
+
+# Mount static files för frontend
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # CORS middleware för frontend-integration
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
@@ -21,13 +26,9 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    """Root endpoint med grundläggande info"""
-    return {
-        "message": "Stems API",
-        "version": "1.0.0",
-        "status": "running",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    """Root endpoint - redirect till frontend"""
+    from fastapi.responses import FileResponse
+    return FileResponse("static/index.html")
 
 @app.get("/ping")
 async def ping():
@@ -49,6 +50,71 @@ async def health():
         "version": "1.0.0"
         # Inte exponera känslig systeminfo
     }
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    """Dummy MVP: Upload endpoint som simulerar filhantering"""
+    
+    # Validera filtyp
+    if not file.filename.lower().endswith(('.mp3', '.wav', '.flac', '.m4a')):
+        raise HTTPException(status_code=400, detail="Endast ljudfiler tillåtna")
+    
+    # Generera unikt jobb-ID
+    job_id = str(uuid.uuid4())
+    
+    # Simulera filhantering (i riktig implementation skulle vi ladda till GCP bucket)
+    file_size = 0
+    if file.size:
+        file_size = file.size
+    
+    return {
+        "status": "uploaded",
+        "job_id": job_id,
+        "filename": file.filename,
+        "file_size": file_size,
+        "message": "Fil mottagen - dummy MVP",
+        "timestamp": datetime.utcnow().isoformat(),
+        "environment": os.getenv("ENVIRONMENT", "development")
+    }
+
+@app.get("/status/{job_id}")
+async def get_job_status(job_id: str):
+    """Dummy MVP: Status endpoint för jobb"""
+    
+    # Simulera olika jobb-statusar
+    import random
+    statuses = ["processing", "completed", "failed"]
+    status = random.choice(statuses)
+    
+    if status == "completed":
+        return {
+            "job_id": job_id,
+            "status": status,
+            "message": "Stem-splitting slutfört - dummy MVP",
+            "download_links": {
+                "vocals": f"https://dummy-download.com/{job_id}/vocals.wav",
+                "drums": f"https://dummy-download.com/{job_id}/drums.wav",
+                "bass": f"https://dummy-download.com/{job_id}/bass.wav",
+                "other": f"https://dummy-download.com/{job_id}/other.wav"
+            },
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    elif status == "failed":
+        return {
+            "job_id": job_id,
+            "status": status,
+            "message": "Stem-splitting misslyckades - dummy MVP",
+            "error": "Simulerat fel för testning",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    else:
+        return {
+            "job_id": job_id,
+            "status": status,
+            "message": "Bearbetar fil - dummy MVP",
+            "progress": random.randint(10, 90),
+            "timestamp": datetime.utcnow().isoformat()
+        }
 
 if __name__ == "__main__":
     import uvicorn
